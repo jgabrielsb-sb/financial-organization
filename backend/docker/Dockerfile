@@ -50,10 +50,6 @@ RUN apk add --no-cache \
 COPY --from=compiler /venv /venv
 COPY --from=compiler /code /code
 
-COPY ./docker/entrypoint/entrypoint.sh /entrypoint/entrypoint.sh
-
-RUN chmod +x /entrypoint/entrypoint.sh
-
 ENV PYTHONPATH=src
 
-ENTRYPOINT ["/entrypoint/entrypoint.sh"]
+CMD ["sh", "-c", "alembic upgrade head && uvicorn src.run_api:app --host 0.0.0.0 --port 8000"]
