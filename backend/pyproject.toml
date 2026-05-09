@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "financial-api"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+  "SQLAlchemy>=2.0",
+  "alembic>=1.13",
+  "psycopg[binary]>=3.1",
+  "pydantic-settings",
+  "psycopg2-binary",
+  "sqlacodegen>=3.1.1",
+  "fastapi>=0.115.0",
+  "uvicorn[standard]>=0.30.0",
+  "pytest-html>=4.1.1",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "--verbose",
+    "--html=report.html",
+]
+markers = [
+    "unit: fast tests that do not use external resources",
+    "integration: tests that integrate with database or infrastructure",
+    "e2e: tests that exercise business flows through the API",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "python-dotenv>=1.2.2",
+]

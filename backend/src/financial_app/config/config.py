@@ -1,0 +1,54 @@
+import os
+from urllib.parse import quote
+
+from pydantic_settings import (
+    BaseSettings,
+    SettingsConfigDict,
+)
+
+
+def get_env_file() -> str:
+    app_env = os.getenv("APP_ENV", "dev")
+
+    if app_env == "test":
+        print("Using test environment")
+        return ".env.test"
+
+    print("Using dev environment")
+    return ".env"
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=get_env_file(),
+        env_file_encoding="utf-8",
+        extra="allow",
+    )
+
+    APP_ENV: str = "dev"
+
+    DB_DRIVER: str = "postgresql"
+    DB_LIBRARY: str = "psycopg"
+
+    DB_USER: str = "postgres"
+    DB_PASSWORD: str = "postgres"
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5432
+    DB_NAME: str
+
+    API_PREFIX: str = "/api"
+    API_VERSION: str = "0.0.1"
+    CORS_ORIGINS: list[str] = ["*"]
+
+    @property
+    def DB_URL(self) -> str:
+        password = quote(self.DB_PASSWORD, safe="")
+        return f"{self.DB_DRIVER}://{self.DB_USER}:{password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+    @property
+    def DB_URL_WITH_LIBRARY(self) -> str:
+        password = quote(self.DB_PASSWORD, safe="")
+        return f"{self.DB_DRIVER}+{self.DB_LIBRARY}://{self.DB_USER}:{password}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+
+
+settings = Settings()
